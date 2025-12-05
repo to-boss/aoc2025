@@ -49,10 +49,10 @@ fn is_invalid2(id: &str) -> bool {
     let max_pattern = id.len() / 2;
 
     for pattern_size in 1..max_pattern + 1 {
-        let pattern = &&id.as_bytes()[0..pattern_size];
+        let pattern = &id.as_bytes()[0..pattern_size];
         let mut chunks = id.as_bytes().chunks_exact(pattern_size);
 
-        let all_same = chunks.all(|chunk| chunk == *pattern);
+        let all_same = chunks.all(|chunk| chunk == pattern);
         if all_same && chunks.remainder().is_empty() {
             return true;
         }
