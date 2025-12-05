@@ -3,13 +3,15 @@ use std::fs;
 struct Dial {
     pub value: usize,
     pub result: usize,
+    count_every_zero: bool,
 }
 
 impl Dial {
-    fn new() -> Dial {
+    fn new(count_every_zero: bool) -> Dial {
         Dial {
             value: 50,
             result: 0,
+            count_every_zero,
         }
     }
 
@@ -21,10 +23,14 @@ impl Dial {
             } else {
                 self.value += 1;
             }
+
+            if self.count_every_zero && self.value == 0 {
+                self.result += 1;
+            }
             n -= 1;
         }
 
-        if self.value == 0 {
+        if !self.count_every_zero && self.value == 0 {
             self.result += 1;
         }
     }
@@ -38,9 +44,12 @@ impl Dial {
                 self.value -= 1;
             }
             n -= 1;
+            if self.count_every_zero && self.value == 0 {
+                self.result += 1;
+            }
         }
 
-        if self.value == 0 {
+        if !self.count_every_zero && self.value == 0 {
             self.result += 1;
         }
     }
@@ -48,12 +57,19 @@ impl Dial {
 
 fn main() {
     let input = fs::read_to_string("../inputs/01.txt").unwrap();
-    let mut dial = Dial::new();
+    let mut dial = Dial::new(false);
     for line in input.lines() {
         let line = line.trim();
         parse_and_apply_line(line, &mut dial);
     }
-    println!("{}", dial.result);
+    println!("part 1: {}", dial.result);
+
+    let mut dial = Dial::new(true);
+    for line in input.lines() {
+        let line = line.trim();
+        parse_and_apply_line(line, &mut dial);
+    }
+    println!("part 2: {}", dial.result);
 }
 
 fn parse_and_apply_line(line: &str, dial: &mut Dial) {
@@ -76,8 +92,9 @@ fn test1() {
     L55
     L1
     L99
-    L122";
-    let mut dial = Dial::new();
+    R14
+    L82";
+    let mut dial = Dial::new(false);
     for line in test_input.lines() {
         let line = line.trim();
         parse_and_apply_line(line, &mut dial);
@@ -92,11 +109,31 @@ fn test2() {
     let test_input = "L50
         L50
         L1";
-    let mut dial = Dial::new();
+    let mut dial = Dial::new(false);
     for line in test_input.lines() {
         let line = line.trim();
         parse_and_apply_line(line, &mut dial);
     }
 
     assert_eq!(1, dial.result);
+}
+
+#[test]
+fn test4() {
+    let test_input = "L68
+    L30
+    R48
+    L5
+    R60
+    L55
+    L1
+    L99
+    L122";
+    let mut dial = Dial::new(true);
+    for line in test_input.lines() {
+        let line = line.trim();
+        parse_and_apply_line(line, &mut dial);
+    }
+
+    assert_eq!(6, dial.result);
 }
